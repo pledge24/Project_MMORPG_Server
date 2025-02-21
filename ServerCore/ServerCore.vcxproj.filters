@@ -13,6 +13,9 @@
     <ClInclude Include="CorePch.h">
       <Filter>Main</Filter>
     </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>Main</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">

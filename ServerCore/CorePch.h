@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Types.h"
+
 #include <iostream>
 
 /*-----------------
@@ -14,6 +16,14 @@
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
+
+/*-----------------
+	Window Socket 
+------------------*/
+#include <winsock2.h>
+#include <mswsock.h>
+#include <ws2tcpip.h>
+#pragma comment(lib, "ws2_32.lib")
 
 using namespace std;
 
