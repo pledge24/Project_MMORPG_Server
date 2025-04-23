@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <thread>
+#include "ThreadManager.h"
 
 #define BUFSIZE 1000
 
@@ -57,20 +58,24 @@ void WorkerThreadMain(HANDLE iocpHandle)
 
 int main(void)
 {
+	// Winsock 시작
 	WSAData wsaData;
 	if (::WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 		return 0;
 
+	// Listen 소켓 생성
 	SOCKET listenSocket = ::socket(AF_INET, SOCK_STREAM, 0);
 	if (listenSocket == INVALID_SOCKET)
 		return 0;
 
+	// Listner 서버 주소 세팅
 	SOCKADDR_IN serverAddr;
 	::memset(&serverAddr, 0, sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_addr.s_addr = ::htonl(INADDR_ANY);
 	serverAddr.sin_port = ::htons(7777);
 
+	// Bind -> Listen
 	if (::bind(listenSocket, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
 		return 0;
 
@@ -83,17 +88,16 @@ int main(void)
 	// CP 생성
 	HANDLE iocpHandle = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
 
+	ThreadManager* threadManager = new ThreadManager();
 
 	// worker Thread
-	vector<thread> workerThreads;
 	const int threadN = 5;
 	for (int i = 0; i < threadN; i++)
 	{
-		workerThreads.push_back(thread([=]()
+		threadManager->Launch([=]()
 			{
 				WorkerThreadMain(iocpHandle);
-			})
-		);
+			});
 	}
 
 	// Accept
@@ -129,10 +133,7 @@ int main(void)
 
 	for (int i = 0; i < threadN; i++)
 	{
-		if (workerThreads[i].joinable())
-		{
-			workerThreads[i].join();
-		}
+		threadManager->Join();
 	}
 
 	return 0;
