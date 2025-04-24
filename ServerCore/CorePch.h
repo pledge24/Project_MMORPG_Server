@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Types.h"
+#include "CoreMacro.h"
+#include "CoreGlobal.h"
 
 #include <iostream>
 
