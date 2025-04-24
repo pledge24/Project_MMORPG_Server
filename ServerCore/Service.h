@@ -4,11 +4,8 @@
 
 enum class ServiceType
 {
-	/*Client는 1~99*/
-
-
-	/*Server는 100~*/
-	SERVER_IOCP = 100
+	Client,
+	Server
 };
 
 //class Service
@@ -28,9 +25,17 @@ enum class ServiceType
 class ServerService
 {
 public:
-	ServerService(NetAddress serverAddr, ServiceType serverType);
+	ServerService(NetAddress serverAddr, IocpCoreRef core, int32 maxSessionsCount = 1);
+
+	NetAddress GetServerAddr() { return _serverAddr; }
+
+	bool Start();
+
+	int32 GetMaxSessionCount() { return _maxSessionsCount; }
 
 private:
-	Listener _listener;
 	NetAddress _serverAddr;
+	IocpCoreRef _core;
+	int32 _maxSessionsCount;
+	Listener _listener;
 };

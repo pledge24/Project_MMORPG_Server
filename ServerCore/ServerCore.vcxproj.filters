@@ -5,6 +5,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{96bdfd4c-df07-4c2c-bfe2-b1c67262b314}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -16,6 +19,18 @@
     <ClInclude Include="Types.h">
       <Filter>Main</Filter>
     </ClInclude>
+    <ClInclude Include="SocketUtil.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Service.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="NetAddress.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Listener.h">
+      <Filter>Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -23,6 +38,18 @@
     </ClCompile>
     <ClCompile Include="CorePch.cpp">
       <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="SocketUtil.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Service.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="NetAddress.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Listener.cpp">
+      <Filter>Network</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
