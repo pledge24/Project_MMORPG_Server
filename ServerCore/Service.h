@@ -2,11 +2,11 @@
 #include "Listener.h"
 #include "NetAddress.h"
 
-enum class ServiceType
-{
-	Client,
-	Server
-};
+//enum class ServiceType
+//{
+//	Client,
+//	Server
+//};
 
 //class Service
 //{
@@ -32,10 +32,11 @@ public:
 	bool Start();
 
 	int32 GetMaxSessionCount() { return _maxSessionsCount; }
+	IocpCoreRef GetIocpCore() { return _core; }
 
 private:
 	NetAddress _serverAddr;
 	IocpCoreRef _core;
 	int32 _maxSessionsCount;
-	Listener _listener;
+	ListenerRef _listener;
 };

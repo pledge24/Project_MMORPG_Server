@@ -155,16 +155,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CoreGlobal.h" />
+    <ClInclude Include="CoreMacro.h" />
     <ClInclude Include="CorePch.h" />
+    <ClInclude Include="IocpCore.h" />
     <ClInclude Include="Listener.h" />
     <ClInclude Include="NetAddress.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Service.h" />
     <ClInclude Include="SocketUtil.h" />
+    <ClInclude Include="ThreadManager.h" />
     <ClInclude Include="Types.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CoreGlobal.cpp" />
     <ClCompile Include="CorePch.cpp" />
+    <ClCompile Include="IocpCore.cpp" />
     <ClCompile Include="Listener.cpp" />
     <ClCompile Include="NetAddress.cpp" />
     <ClCompile Include="pch.cpp">
@@ -175,6 +181,7 @@
     </ClCompile>
     <ClCompile Include="Service.cpp" />
     <ClCompile Include="SocketUtil.cpp" />
+    <ClCompile Include="ThreadManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

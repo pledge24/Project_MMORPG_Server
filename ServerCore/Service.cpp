@@ -8,5 +8,5 @@ ServerService::ServerService(NetAddress serverAddr, IocpCoreRef core, int32 maxS
 
 bool ServerService::Start()
 {
-	_listener.StartAccept();
+	_listener->StartAccept();
 }

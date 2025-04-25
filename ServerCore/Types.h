@@ -22,8 +22,12 @@ using uint64 = unsigned __int64;
 
 #define USING_SHARED_PTR(name)	using name##Ref = std::shared_ptr<class name>;
 
+
 USING_SHARED_PTR(ServerService);
 USING_SHARED_PTR(IocpCore);
+USING_SHARED_PTR(Listener);
+USING_SHARED_PTR(IocpObject);
+USING_SHARED_PTR(Session);
 
 #define size16(val)		static_cast<int16>(sizeof(val))
 #define size32(val)		static_cast<int32>(sizeof(val))
