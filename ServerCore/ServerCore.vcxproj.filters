@@ -46,6 +46,12 @@
     <ClInclude Include="IocpCore.h">
       <Filter>Network</Filter>
     </ClInclude>
+    <ClInclude Include="Session.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkEvent.h">
+      <Filter>Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -73,6 +79,12 @@
       <Filter>Thread</Filter>
     </ClCompile>
     <ClCompile Include="IocpCore.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkEvent.cpp">
       <Filter>Network</Filter>
     </ClCompile>
   </ItemGroup>

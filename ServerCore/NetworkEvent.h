@@ -16,10 +16,11 @@ enum class EventType
 class NetworkEvent : public WSAOVERLAPPED
 {
 public:
-	NetworkEvent(EventType eventType) : _eventType(eventType) {}
+	NetworkEvent(EventType type) : eventType(type) {}
 
-private:
-	EventType _eventType;
+public:
+	EventType eventType;
+	IocpObjectRef owner;
 };
 
 /*-----------------
@@ -50,6 +51,7 @@ class AcceptEvent : public NetworkEvent
 {
 public:
 	AcceptEvent() : NetworkEvent(EventType::Accept) {}
+	SessionRef session;
 };
 
 /*--------------

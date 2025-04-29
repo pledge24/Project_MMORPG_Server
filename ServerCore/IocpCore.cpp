@@ -19,10 +19,10 @@ bool IocpCore::Dispatch(uint32 timeoutMs)
 	ULONG_PTR key = 0;
 	NetworkEvent* networkEvent = nullptr;
 
-	if (::GetQueuedCompletionStatus(_iocpHandle, OUT & numOfBytes, OUT & key, OUT reinterpret_cast<LPOVERLAPPED*>(&networkEvent), timeoutMs))
+	if (::GetQueuedCompletionStatus(_iocpHandle, OUT &numOfBytes, OUT &key, OUT reinterpret_cast<LPOVERLAPPED*>(&networkEvent), timeoutMs))
 	{
 		IocpObjectRef iocpObject = networkEvent->owner;
-		iocpObject->Dispatch(iocpEvent, numOfBytes);
+		iocpObject->Dispatch(networkEvent, numOfBytes);
 	}
 	else
 	{
@@ -33,8 +33,8 @@ bool IocpCore::Dispatch(uint32 timeoutMs)
 			return false;
 		default:
 			// TODO : 로그 찍기
-			IocpObjectRef iocpObject = iocpEvent->owner;
-			iocpObject->Dispatch(iocpEvent, numOfBytes);
+			IocpObjectRef iocpObject = networkEvent->owner;
+			iocpObject->Dispatch(networkEvent, numOfBytes);
 			break;
 		}
 	}

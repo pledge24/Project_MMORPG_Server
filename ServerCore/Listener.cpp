@@ -26,10 +26,12 @@ void Listener::Dispatch(NetworkEvent* networkEvent, int32 numOfBytes)
 	ProcessAccept(acceptEvent);
 }
 
-bool Listener::StartAccept()
+bool Listener::StartListen()
 {
 	// Socket
 	_listenSocket = SocketUtil::CreateSocket();
+	if (_listenSocket == INVALID_SOCKET)
+		return false;
 
 	// Bind 
 	if (SocketUtil::Bind(_listenSocket, _service->GetServerAddr()) == false)
@@ -41,14 +43,16 @@ bool Listener::StartAccept()
 
 	cout << "Success to generate listen Socket" << endl;
 
+	return true;
+}
 
-	// ===[Accept]===
-
+bool Listener::StartAccept()
+{
 	const int32 acceptCount = _service->GetMaxSessionCount();
 	for (int32 i = 0; i < acceptCount; i++)
 	{
 		AcceptEvent* acceptEvent = new AcceptEvent();
-		//acceptEvent->owner = shared_from_this();
+		acceptEvent->owner = shared_from_this();
 		_acceptEvents.push_back(acceptEvent);
 		RegisterAccept(acceptEvent);
 	}
@@ -77,7 +81,7 @@ void Listener::ProcessAccept(AcceptEvent* acceptEvent)
 {
 	SessionRef session = acceptEvent->session;
 
-	if (false == SocketUtil::SetUpdateAcceptSocket(session->GetSocket(), _socket))
+	if (false == SocketUtil::SetUpdateAcceptSocket(session->GetSocket(), _listenSocket))
 	{
 		RegisterAccept(acceptEvent);
 		return;

@@ -25,7 +25,7 @@
 class ServerService
 {
 public:
-	ServerService(NetAddress serverAddr, IocpCoreRef core, int32 maxSessionsCount = 1);
+	ServerService(NetAddress serverAddr, IocpCoreRef core, int32 maxSessionsCount = SOMAXCONN);
 
 	NetAddress GetServerAddr() { return _serverAddr; }
 
