@@ -22,10 +22,10 @@ public:
 	~IocpCore();
 
 public:
-	bool		RegisterSocket();
+	bool		RegisterSocket(SOCKET socket);
 	bool		Dispatch(uint32 timeoutMs = INFINITE);
 
 private:
-	HANDLE _iocpHandle;
+	HANDLE		_iocpHandle;
 };
 

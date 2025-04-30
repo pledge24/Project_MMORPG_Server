@@ -21,6 +21,7 @@ HANDLE Listener::GetHandle()
 
 void Listener::Dispatch(NetworkEvent* networkEvent, int32 numOfBytes)
 {
+	cout << "UM" << '\n';
 	ASSERT_CRASH(networkEvent->eventType == EventType::Accept);
 	AcceptEvent* acceptEvent = static_cast<AcceptEvent*>(networkEvent);
 	ProcessAccept(acceptEvent);
@@ -48,6 +49,9 @@ bool Listener::StartListen()
 
 bool Listener::StartAccept()
 {
+	if (_service->GetIocpCore()->RegisterSocket(_listenSocket) == false)
+		return false;
+
 	const int32 acceptCount = _service->GetMaxSessionCount();
 	for (int32 i = 0; i < acceptCount; i++)
 	{
@@ -57,14 +61,17 @@ bool Listener::StartAccept()
 		RegisterAccept(acceptEvent);
 	}
 
-	cout << "Succes to register AcceptEvent: " << acceptCount << endl;
+	cout << "Success to register AcceptEvent: " << acceptCount << endl;
 
 	return true;
 }
 
 void Listener::RegisterAccept(AcceptEvent* acceptEvent)
 {
-	Session* session = new Session();
+	SessionRef session = make_shared<Session>();
+	_service->GetIocpCore()->RegisterSocket(session->GetSocket());
+
+	acceptEvent->session = session;
 
 	DWORD bytesReceived = 0;
 	if (false == SocketUtil::AcceptEx(_listenSocket, session->GetSocket(), session->_recvBuffer, 0, sizeof(SOCKADDR_IN) + 16,
@@ -81,6 +88,8 @@ void Listener::RegisterAccept(AcceptEvent* acceptEvent)
 
 void Listener::ProcessAccept(AcceptEvent* acceptEvent)
 {
+	cout << "New Client Arrived" << endl;
+
 	SessionRef session = acceptEvent->session;
 
 	if (false == SocketUtil::SetUpdateAcceptSocket(session->GetSocket(), _listenSocket))

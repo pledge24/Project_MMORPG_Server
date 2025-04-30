@@ -13,6 +13,11 @@ IocpCore::~IocpCore()
 	::CloseHandle(_iocpHandle);
 }
 
+bool IocpCore::RegisterSocket(SOCKET socket)
+{
+	return CreateIoCompletionPort((HANDLE)socket, _iocpHandle, 0, 0);
+}
+
 bool IocpCore::Dispatch(uint32 timeoutMs)
 {
 	DWORD numOfBytes = 0;
