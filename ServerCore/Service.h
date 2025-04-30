@@ -8,9 +8,10 @@
 //	Server
 //};
 
-//class Service
+//class Service : public enable_shared_from_this<Service>
 //{
 //};
+
 //
 //class ClientService : public Service
 //{
@@ -22,7 +23,7 @@
 ------------------*/
 
 // 일단 IOCP 모델 고정으로 생각.
-class ServerService
+class ServerService : public enable_shared_from_this<ServerService>
 {
 public:
 	ServerService(NetAddress serverAddr, IocpCoreRef core, int32 maxSessionsCount = SOMAXCONN);

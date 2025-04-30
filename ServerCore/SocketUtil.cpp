@@ -9,10 +9,14 @@ LPFN_CONNECTEX		SocketUtil::ConnectEx = nullptr;
 LPFN_DISCONNECTEX	SocketUtil::DisconnectEx = nullptr;
 LPFN_ACCEPTEX		SocketUtil::AcceptEx = nullptr;
 
-void SocketUtil::Init()
+bool				SocketUtil::alreadyInit = false;
+
+bool SocketUtil::Init()
 {
 	// TODO? : 여러번 실행되는 것을 막아야 하지 않나?
-
+	if (alreadyInit)
+		return false;
+			
 	/* Winsock 시작 */
 	WSADATA wsaData;
 	ASSERT_CRASH(::WSAStartup(MAKEWORD(2, 2), OUT & wsaData) == 0);
@@ -24,6 +28,9 @@ void SocketUtil::Init()
 	ASSERT_CRASH(BindWindowsFunction(dummySocket, WSAID_ACCEPTEX, reinterpret_cast<LPVOID*>(&AcceptEx)));
 
 	Close(dummySocket);
+
+	alreadyInit = true;
+	return true;
 }
 
 void SocketUtil::Clear()

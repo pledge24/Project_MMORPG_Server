@@ -6,7 +6,7 @@
 #include "NetworkEvent.h"
 #include "Session.h"
 
-Listener::Listener()
+Listener::Listener(ServerServiceRef service): _service(service)
 {
 }
 
@@ -56,6 +56,8 @@ bool Listener::StartAccept()
 		_acceptEvents.push_back(acceptEvent);
 		RegisterAccept(acceptEvent);
 	}
+
+	cout << "Succes to register AcceptEvent: " << acceptCount << endl;
 
 	return true;
 }

@@ -7,7 +7,7 @@ class ServerService;
 class Listener : public IocpObject
 {
 public:
-	Listener();
+	Listener(ServerServiceRef service);
 	~Listener();
 
 public:
@@ -23,7 +23,7 @@ public:
 	void ProcessAccept(AcceptEvent* acceptEvent);
 
 private:
-	SOCKET _listenSocket;
+	SOCKET _listenSocket = INVALID_SOCKET;
 	ServerServiceRef _service;
 	vector<AcceptEvent*> _acceptEvents;
 };

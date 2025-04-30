@@ -13,8 +13,11 @@ public:
 	static LPFN_DISCONNECTEX	DisconnectEx;
 	static LPFN_ACCEPTEX		AcceptEx;
 
+private:
+	static bool					alreadyInit;
+
 public:
-	static void Init();
+	static bool Init();
 	static void Clear();
 
 	static bool BindWindowsFunction(SOCKET socket, GUID guid, LPVOID* fn);

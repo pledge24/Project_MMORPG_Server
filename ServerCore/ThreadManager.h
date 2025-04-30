@@ -2,8 +2,8 @@
 
 #include <thread>
 #include <functional>
-#include <mutex>    // mutex 사용을 위해 추가
-#include <vector>   // vector 사용을 위해 추가
+#include <mutex>
+#include <vector>
 
 /*------------------
 	ThreadManager

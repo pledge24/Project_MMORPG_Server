@@ -3,8 +3,6 @@
 #include "Service.h"
 #include "IocpCore.h"
 
-#define BUFSIZE 1000
-
 void WorkerThreadMain(ServerServiceRef service)
 {
 	while (true)
@@ -17,7 +15,8 @@ int main(void)
 {
 	ServerServiceRef service = make_shared<ServerService>(
 		NetAddress("127.0.0.1"s, 7777),
-		make_shared<IocpCore>()
+		make_shared<IocpCore>(),
+		30
 	);
 
 	ASSERT_CRASH(service->Start());

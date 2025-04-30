@@ -41,43 +41,43 @@ int main(void)
 
 	cout << "Connected to Server" << endl;
 
-	char sendBuffer[1000] = "Hello World";
-	WSAEVENT wsaEvent = ::WSACreateEvent();
-	WSAOVERLAPPED overlapped = {};
-	overlapped.hEvent = wsaEvent;
+	//char sendBuffer[1000] = "Hello World";
+	//WSAEVENT wsaEvent = ::WSACreateEvent();
+	//WSAOVERLAPPED overlapped = {};
+	//overlapped.hEvent = wsaEvent;
 
-	// Send(Echo)
-	while (true)
-	{
-		WSABUF wsaBuf;
-		wsaBuf.buf = sendBuffer;
-		wsaBuf.len = 1000;
+	//// Send(Echo)
+	//while (true)
+	//{
+	//	WSABUF wsaBuf;
+	//	wsaBuf.buf = sendBuffer;
+	//	wsaBuf.len = 1000;
 
-		DWORD numberOfBytesSent = 0;
-		DWORD flags = 0;
+	//	DWORD numberOfBytesSent = 0;
+	//	DWORD flags = 0;
 
-		// Register Send
-		if (::WSASend(clientSocket, &wsaBuf, 1, &numberOfBytesSent, flags, &overlapped, nullptr) == SOCKET_ERROR)
-		{
-			// Pending
-			if (::WSAGetLastError() == WSA_IO_PENDING)
-			{
-				::WSAWaitForMultipleEvents(1, &wsaEvent, TRUE, WSA_INFINITE, FALSE);
-				::WSAGetOverlappedResult(clientSocket, &overlapped, &numberOfBytesSent, FALSE, &flags);
-			}
-			else
-			{
-				// TODO: 오류 처리
-				// ...
-				break;
-			}
-		}
+	//	// Register Send
+	//	if (::WSASend(clientSocket, &wsaBuf, 1, &numberOfBytesSent, flags, &overlapped, nullptr) == SOCKET_ERROR)
+	//	{
+	//		// Pending
+	//		if (::WSAGetLastError() == WSA_IO_PENDING)
+	//		{
+	//			::WSAWaitForMultipleEvents(1, &wsaEvent, TRUE, WSA_INFINITE, FALSE);
+	//			::WSAGetOverlappedResult(clientSocket, &overlapped, &numberOfBytesSent, FALSE, &flags);
+	//		}
+	//		else
+	//		{
+	//			// TODO: 오류 처리
+	//			// ...
+	//			break;
+	//		}
+	//	}
 
-		cout << "Send Data ! Len = " << numberOfBytesSent << endl;
+	//	cout << "Send Data ! Len = " << numberOfBytesSent << endl;
 
-		this_thread::sleep_for(1s);
+	//	this_thread::sleep_for(1s);
 
-	}
+	//}
 
 	return 0;
 }
