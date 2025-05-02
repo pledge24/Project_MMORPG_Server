@@ -30,7 +30,7 @@ public:
 	void RegisterConnect();
 	void RegisterDisconnect();
 	void RegisterRecv();
-	void RegisterSend();
+	void RegisterSend(string str);
 
 	/* 네트워크 이벤트 실행 */
 	void ProcessConnect();
@@ -43,4 +43,7 @@ public:
 	SOCKET _socket = INVALID_SOCKET;
 	char _recvBuffer[BUFFER_SIZE];
 	int32 recvBytes = 0;
+
+	char _sendBuffer[BUFFER_SIZE];
+	int32 sendBytes = 0;
 };

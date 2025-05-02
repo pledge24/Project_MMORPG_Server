@@ -53,17 +53,28 @@ void Session::RegisterRecv()
 	wsaBuf.buf = _recvBuffer;
 	wsaBuf.len = BUFFER_SIZE;
 
+	DWORD numOfBytes = 0;
+	DWORD flags = 0;
+
 	RecvEvent* recvEvent = new RecvEvent();
 	recvEvent->owner = static_pointer_cast<Session>(shared_from_this());
 
-	DWORD numOfBytes = 0;
-	DWORD flags = 0;
 	::WSARecv(_socket, &wsaBuf, 1, &numOfBytes, &flags, static_cast<LPWSAOVERLAPPED>(recvEvent), NULL);
 }
 
-void Session::RegisterSend()
+void Session::RegisterSend(string str)
 {
-	
+	WSABUF sendBuf;
+	sendBuf.buf = const_cast<char*>(str.c_str());
+	sendBuf.len = str.length();
+
+	DWORD numOfBytes = 0;
+	DWORD flags = 0;
+
+	SendEvent* sendEvent = new SendEvent();
+	sendEvent->owner = static_pointer_cast<Session>(shared_from_this());
+
+	::WSASend(_socket, &sendBuf, 1, &numOfBytes, flags, static_cast<LPWSAOVERLAPPED>(sendEvent), NULL);
 }
 
 void Session::ProcessConnect()
@@ -82,8 +93,12 @@ void Session::ProcessRecv(NetworkEvent* networkEvent, int32 numOfBytes)
 
 	// 현재 세션의 recv 이벤트 재등록.
 	RegisterRecv();
+
+	// ping pong
+	RegisterSend("nice to meet you"s);
 }
 
 void Session::ProcessSend(int32 numOfBytes)
 {
+	cout << "comlete to send data = " << numOfBytes << endl;
 }

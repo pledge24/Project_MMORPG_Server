@@ -46,7 +46,7 @@ int main(void)
 	WSAOVERLAPPED overlapped = {};
 	overlapped.hEvent = wsaEvent;
 
-	// Send(Echo)
+	// Send And Recv(Echo)
 	while (true)
 	{
 		WSABUF wsaBuf;
@@ -74,6 +74,41 @@ int main(void)
 		}
 
 		cout << "Send Data ! Len = " << numberOfBytesSent << endl;
+
+		{
+			char recvBuffer[1000];
+
+			WSABUF wsaBuf;
+			wsaBuf.buf = recvBuffer;
+			wsaBuf.len = 1000;
+
+			DWORD numberOfBytesRecv = 0;
+			DWORD flags = 0;
+
+			WSAEVENT wsaEvent = ::WSACreateEvent();
+			WSAOVERLAPPED overlapped = {};
+			overlapped.hEvent = wsaEvent;
+
+			// Register Send
+			if (::WSARecv(clientSocket, &wsaBuf, 1, &numberOfBytesRecv, &flags, &overlapped, NULL) == SOCKET_ERROR)
+			{
+				// Pending
+				int errCode = WSAGetLastError();
+				if (errCode == WSA_IO_PENDING)
+				{
+					::WSAWaitForMultipleEvents(1, &wsaEvent, TRUE, WSA_INFINITE, FALSE);
+					::WSAGetOverlappedResult(clientSocket, &overlapped, &numberOfBytesRecv, FALSE, &flags);
+				}
+				else
+				{
+					// TODO: 오류 처리
+					// ...
+					break;
+				}
+			}
+
+			cout << "comlete to recv data = " << recvBuffer << endl;
+		}
 
 		this_thread::sleep_for(1s);
 
