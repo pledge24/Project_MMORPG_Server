@@ -2,6 +2,8 @@
 
 #include "IocpCore.h"
 #include "NetAddress.h"
+#include "RecvBuffer.h"
+#include <vector>
 
 class Session : public IocpObject
 {
@@ -30,7 +32,7 @@ public:
 	void RegisterConnect();
 	void RegisterDisconnect();
 	void RegisterRecv();
-	void RegisterSend(string str);
+	void RegisterSend(vector<BYTE> packet);
 
 	/* 네트워크 이벤트 실행 */
 	void ProcessConnect();
@@ -41,9 +43,7 @@ public:
 public:
 	NetAddress _addr;
 	SOCKET _socket = INVALID_SOCKET;
-	char _recvBuffer[BUFFER_SIZE];
-	int32 recvBytes = 0;
-
-	char _sendBuffer[BUFFER_SIZE];
-	int32 sendBytes = 0;
+	RecvBuffer _recvBuffer;
+	//vector<BYTE> _sendBuffer;
+	//int32 sendBytes = 0;
 };

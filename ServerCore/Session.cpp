@@ -3,7 +3,7 @@
 #include "SocketUtil.h"
 #include "NetworkEvent.h"
 
-Session::Session()
+Session::Session() : _recvBuffer(BUFFER_SIZE)
 {
 	_socket = SocketUtil::CreateSocket();
 }
@@ -50,7 +50,7 @@ void Session::RegisterDisconnect()
 void Session::RegisterRecv()
 {
 	WSABUF wsaBuf;
-	wsaBuf.buf = _recvBuffer;
+	wsaBuf.buf = reinterpret_cast<char*>(_recvBuffer.Data());
 	wsaBuf.len = BUFFER_SIZE;
 
 	DWORD numOfBytes = 0;
@@ -62,11 +62,12 @@ void Session::RegisterRecv()
 	::WSARecv(_socket, &wsaBuf, 1, &numOfBytes, &flags, static_cast<LPWSAOVERLAPPED>(recvEvent), NULL);
 }
 
-void Session::RegisterSend(string str)
+// 직렬화(serialized)된 패킷을 받아서 비동기 송신.
+void Session::RegisterSend(vector<BYTE> packet)
 {
 	WSABUF sendBuf;
-	sendBuf.buf = const_cast<char*>(str.c_str());
-	sendBuf.len = str.length();
+	sendBuf.buf = reinterpret_cast<char*>(packet.data());
+	sendBuf.len = packet.size();
 
 	DWORD numOfBytes = 0;
 	DWORD flags = 0;
@@ -88,17 +89,25 @@ void Session::ProcessDisconnect()
 
 void Session::ProcessRecv(NetworkEvent* networkEvent, int32 numOfBytes)
 {
-	cout << "Client recieve data = " << _recvBuffer << endl;
+	vector<BYTE> recvData(numOfBytes);
+	memcpy(recvData.data(), _recvBuffer.Data(), numOfBytes);
+
+	
+	cout << "Client recieve data = " << (char*)recvData.data() << endl;
 	delete networkEvent;
+
+	// ping pong
+	RegisterSend(recvData);
+
+	// 3초 정도 sleep(TCP가 뭉쳐서 recv받는거 체크)
+	this_thread::sleep_for(3000ms);
 
 	// 현재 세션의 recv 이벤트 재등록.
 	RegisterRecv();
 
-	// ping pong
-	RegisterSend("nice to meet you"s);
 }
 
 void Session::ProcessSend(int32 numOfBytes)
 {
-	cout << "comlete to send data = " << numOfBytes << endl;
+	cout << "complete to send data = " << numOfBytes << endl;
 }
