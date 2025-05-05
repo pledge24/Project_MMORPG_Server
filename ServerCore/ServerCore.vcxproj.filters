@@ -52,8 +52,12 @@
     <ClInclude Include="NetworkEvent.h">
       <Filter>Network</Filter>
     </ClInclude>
-    <ClInclude Include="RecvBuffer.h" />
-    <ClInclude Include="SendBuffer.h" />
+    <ClInclude Include="RecvBuffer.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="SendBuffer.h">
+      <Filter>Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -89,11 +93,11 @@
     <ClCompile Include="NetworkEvent.cpp">
       <Filter>Network</Filter>
     </ClCompile>
-    <ClCompile Include="RecvBuffer.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
     <ClCompile Include="SendBuffer.cpp">
-      <Filter>Main</Filter>
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="RecvBuffer.cpp">
+      <Filter>Network</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

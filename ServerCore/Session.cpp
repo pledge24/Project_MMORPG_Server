@@ -50,8 +50,8 @@ void Session::RegisterDisconnect()
 void Session::RegisterRecv()
 {
 	WSABUF wsaBuf;
-	wsaBuf.buf = reinterpret_cast<char*>(_recvBuffer.Data());
-	wsaBuf.len = BUFFER_SIZE;
+	wsaBuf.buf = reinterpret_cast<char*>(_recvBuffer.WritePos());
+	wsaBuf.len = _recvBuffer.FreeSize();
 
 	DWORD numOfBytes = 0;
 	DWORD flags = 0;
@@ -98,9 +98,6 @@ void Session::ProcessRecv(NetworkEvent* networkEvent, int32 numOfBytes)
 
 	// ping pong
 	RegisterSend(recvData);
-
-	// 3초 정도 sleep(TCP가 뭉쳐서 recv받는거 체크)
-	this_thread::sleep_for(3000ms);
 
 	// 현재 세션의 recv 이벤트 재등록.
 	RegisterRecv();

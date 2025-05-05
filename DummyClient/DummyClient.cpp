@@ -121,8 +121,8 @@ int main(void)
 			}
 		}
 
-		string recvStr(recvBuffer);
-		cout << "complete to recv data = " << recvStr << endl;
+		string recvStr(recvBuffer, numberOfBytesRecv);
+		cout << "complete to recv data = " << recvStr << " " << numberOfBytesRecv << endl;
 	}
 
 	return 0;
