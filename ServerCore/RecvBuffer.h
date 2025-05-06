@@ -15,15 +15,16 @@ public:
 	RecvBuffer(int32 chunkSize = DEFAULT_CHUNKSIZE/*64KB*/, int32 multipleN = DEFAULT_MULTIPLE_N);
 	~RecvBuffer();
 
-	/* RecvBuffer 커서 관련*/
+					/* RecvBuffer 커서 관련*/
 	void			Clean();
 	bool			OnRead(int32 numOfBytes);
 	bool			OnWrite(int32 numOfBytes);
 
-	/* RecvBuffer 정보 관련*/
+					/* RecvBuffer 정보 관련*/
 	BYTE*			Data()			{ return _buffer.data(); }
 	BYTE*			ReadPos()		{ return &_buffer[_readPos]; }
 	BYTE*			WritePos()		{ return &_buffer[_writePos]; }
+	int32			Size()			{ return _buffer.size(); }
 	int32			UnreadSize()	{ return _writePos - _readPos; }
 	int32			FreeSize()		{ return _bufferSize - _writePos; }
 

@@ -22,10 +22,10 @@ void Session::Dispatch(NetworkEvent* networkEvent, int32 numOfBytes)
 	switch (networkEvent->eventType)
 	{
 	case EventType::Connect:
-		// TODO
+		ProcessConnect();
 		break;
 	case EventType::Disconnect:
-		// TODO
+		ProcessDisconnect();
 		break;
 	case EventType::Recv:
 		ProcessRecv(networkEvent, numOfBytes);
@@ -39,8 +39,49 @@ void Session::Dispatch(NetworkEvent* networkEvent, int32 numOfBytes)
 	}
 }
 
-void Session::RegisterConnect()
+void Session::Send(SendBufferRef sendBuffer)
 {
+}
+
+bool Session::Connect()
+{
+	return RegisterConnect();
+}
+
+void Session::Disconnect(const WCHAR* cause)
+{
+}
+
+bool Session::RegisterConnect()
+{
+	//if (IsConnected())
+	//	return false;
+
+	//if (GetService()->GetServiceType() != ServiceType::Client)
+	//	return false;
+
+	//if (SocketUtil::SetReuseAddress(_socket, true) == false)
+	//	return false;
+
+	//if (SocketUtil::BindAnyAddress(_socket, 0/*남는거*/) == false)
+	//	return false;
+
+	//_connectEvent.Init();
+	//_connectEvent.owner = shared_from_this(); // ADD_REF
+
+	//DWORD numOfBytes = 0;
+	//SOCKADDR_IN sockAddr = GetService()->GetNetAddress().GetSockAddr();
+	//if (false == SocketUtils::ConnectEx(_socket, reinterpret_cast<SOCKADDR*>(&sockAddr), sizeof(sockAddr), nullptr, 0, &numOfBytes, &_connectEvent))
+	//{
+	//	int32 errorCode = ::WSAGetLastError();
+	//	if (errorCode != WSA_IO_PENDING)
+	//	{
+	//		_connectEvent.owner = nullptr; // RELEASE_REF
+	//		return false;
+	//	}
+	//}
+
+	return true;
 }
 
 void Session::RegisterDisconnect()
@@ -107,4 +148,6 @@ void Session::ProcessRecv(NetworkEvent* networkEvent, int32 numOfBytes)
 void Session::ProcessSend(int32 numOfBytes)
 {
 	cout << "complete to send data = " << numOfBytes << endl;
+
+	//RegisterSend();
 }

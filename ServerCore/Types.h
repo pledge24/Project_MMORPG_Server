@@ -28,6 +28,7 @@ USING_SHARED_PTR(IocpCore);
 USING_SHARED_PTR(Listener);
 USING_SHARED_PTR(IocpObject);
 USING_SHARED_PTR(Session);
+USING_SHARED_PTR(SendBuffer);
 
 #define size16(val)		static_cast<int16>(sizeof(val))
 #define size32(val)		static_cast<int32>(sizeof(val))
