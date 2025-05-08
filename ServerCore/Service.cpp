@@ -1,24 +1,118 @@
 #include "pch.h"
 #include "Service.h"
-#include "SocketUtil.h"
+#include "Session.h"
+#include "Listener.h"
 
-ServerService::ServerService(NetAddress serverAddr, IocpCoreRef core, int32 maxSessionsCount):
-	_serverAddr(serverAddr), _core(core), _maxSessionsCount(maxSessionsCount)
+/*-------------------
+		Service
+--------------------*/
+
+Service::Service(ServiceType type, NetAddress address, IocpCoreRef core, SessionFactory factory, int32 maxSessionCount)
+	: _type(type), _netAddress(address), _iocpCore(core), _sessionFactory(factory), _maxSessionCount(maxSessionCount)
+{
+
+}
+
+Service::~Service()
+{
+}
+
+void Service::CloseService()
+{
+	// TODO
+}
+
+void Service::Broadcast(SendBufferRef sendBuffer)
+{
+	WRITE_LOCK;
+	for (const auto& session : _sessions)
+	{
+		session->Send(sendBuffer);
+	}
+}
+
+SessionRef Service::CreateSession()
+{
+	SessionRef session = _sessionFactory();
+	session->SetService(shared_from_this());
+
+	if (_iocpCore->RegisterSocket(session->GetSocket()) == false)
+		return nullptr;
+
+	return session;
+}
+
+void Service::AddSession(SessionRef session)
+{
+	WRITE_LOCK;
+	_sessionCount++;
+	_sessions.insert(session);
+}
+
+void Service::RemoveSession(SessionRef session)
+{
+	WRITE_LOCK;
+	ASSERT_CRASH(_sessions.erase(session) != 0);
+	_sessionCount--;
+}
+
+/*-------------------
+	ClientService
+--------------------*/
+
+ClientService::ClientService(NetAddress targetAddress, IocpCoreRef core, SessionFactory factory, int32 maxSessionCount)
+	: Service(ServiceType::Client, targetAddress, core, factory, maxSessionCount)
+{
+}
+
+bool ClientService::Start()
+{
+	if (CanStart() == false)
+		return false;
+
+	const int32 sessionCount = GetMaxSessionCount();
+	for (int32 i = 0; i < sessionCount; i++)
+	{
+		SessionRef session = CreateSession();
+		if (session->Connect() == false)
+			return false;
+	}
+
+	return true;
+}
+
+/*-------------------
+	ServerService
+--------------------*/
+
+ServerService::ServerService(NetAddress address, IocpCoreRef core, SessionFactory factory, int32 maxSessionCount)
+	: Service(ServiceType::Server, address, core, factory, maxSessionCount)
 {
 }
 
 bool ServerService::Start()
 {
-	//ServerServiceRef service = static_pointer_cast<ServerService>(shared_from_this());
-	_listener = make_shared<Listener>(shared_from_this());
+	if (CanStart() == false)
+		return false;
+
+	_listener = make_shared<Listener>();
 	if (_listener == nullptr)
 		return false;
 
-	if (false == _listener->StartListen())
+	_listener->SetService(static_pointer_cast<ServerService>(shared_from_this()));
+
+	if (_listener->StartListen() == false)
 		return false;
 
-	if (false == _listener->StartAccept())
+	if (_listener->StartAccept() == false)
 		return false;
 
 	return true;
+}
+
+void ServerService::CloseService()
+{
+	// TODO
+
+	Service::CloseService();
 }

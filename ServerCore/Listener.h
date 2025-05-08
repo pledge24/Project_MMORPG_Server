@@ -7,20 +7,22 @@ class ServerService;
 class Listener : public IocpObject
 {
 public:
-	Listener(ServerServiceRef service);
+	Listener();
 	~Listener();
 
 public:
-	/* 인터페이스 구현 */
-	virtual HANDLE GetHandle() override;
-	virtual void Dispatch(class NetworkEvent* networkEvent, int32 numOfBytes = 0) override;
+						/* 인터페이스 구현 */
+	virtual HANDLE		GetHandle() override;
+	virtual void		Dispatch(class NetworkEvent* networkEvent, int32 numOfBytes = 0) override;
 
-	bool StartListen();
-	bool StartAccept();
+	bool				StartListen();
+	bool				StartAccept();
 
-	/* 수신 관련 */
-	void RegisterAccept(AcceptEvent* acceptEvent);
-	void ProcessAccept(AcceptEvent* acceptEvent);
+						/* 수신 관련 */
+	void				RegisterAccept(AcceptEvent* acceptEvent);
+	void				ProcessAccept(AcceptEvent* acceptEvent);
+
+	void				SetService(ServerServiceRef service) { _service = service; }
 
 private:
 	SOCKET _listenSocket = INVALID_SOCKET;

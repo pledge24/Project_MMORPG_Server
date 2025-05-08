@@ -6,7 +6,7 @@
 #include "NetworkEvent.h"
 #include "Session.h"
 
-Listener::Listener(ServerServiceRef service): _service(service)
+Listener::Listener()
 {
 }
 
@@ -21,7 +21,6 @@ HANDLE Listener::GetHandle()
 
 void Listener::Dispatch(NetworkEvent* networkEvent, int32 numOfBytes)
 {
-	cout << "UM" << '\n';
 	ASSERT_CRASH(networkEvent->eventType == EventType::Accept);
 	AcceptEvent* acceptEvent = static_cast<AcceptEvent*>(networkEvent);
 	ProcessAccept(acceptEvent);
@@ -34,8 +33,24 @@ bool Listener::StartListen()
 	if (_listenSocket == INVALID_SOCKET)
 		return false;
 
+	// Set SocketOpt: 주소 재사용 가능(개발 편함용)
+	if (SocketUtil::SetReuseAddress(_listenSocket, true) == false)
+		return false;
+
+	// Set SocketOpt: 잉여 송신 데이터 무시.
+	if (SocketUtil::SetLinger(_listenSocket, 0, 0) == false)
+		return false;
+
+	// Set SocketOpt: 네이글 알고리즘 비활성화
+	if (SocketUtil::SetTcpNoDelay(_listenSocket, false) == false)
+		return false;
+
+	// IOCP에 등록
+	if (_service->GetIocpCore()->RegisterSocket(_listenSocket) == false)
+		return false;
+
 	// Bind 
-	if (SocketUtil::Bind(_listenSocket, _service->GetServerAddr()) == false)
+	if (SocketUtil::Bind(_listenSocket, _service->GetNetAddress()) == false)
 		return false;
 
 	// Listen
@@ -49,9 +64,6 @@ bool Listener::StartListen()
 
 bool Listener::StartAccept()
 {
-	if (_service->GetIocpCore()->RegisterSocket(_listenSocket) == false)
-		return false;
-
 	const int32 acceptCount = _service->GetMaxSessionCount();
 	for (int32 i = 0; i < acceptCount; i++)
 	{
@@ -68,7 +80,7 @@ bool Listener::StartAccept()
 
 void Listener::RegisterAccept(AcceptEvent* acceptEvent)
 {
-	SessionRef session = make_shared<Session>();
+	SessionRef session = _service->CreateSession();
 	_service->GetIocpCore()->RegisterSocket(session->GetSocket());
 
 	acceptEvent->session = session;
@@ -98,7 +110,7 @@ void Listener::ProcessAccept(AcceptEvent* acceptEvent)
 		return;
 	}
 
-	SOCKADDR_IN sockAddress;
+	SOCKADDR_IN sockAddress; // 상대 호스트 주소.
 	int32 sizeOfSockAddr = sizeof(sockAddress);
 	if (SOCKET_ERROR == ::getpeername(session->GetSocket(), OUT reinterpret_cast<SOCKADDR*>(&sockAddress), &sizeOfSockAddr))
 	{
@@ -107,7 +119,7 @@ void Listener::ProcessAccept(AcceptEvent* acceptEvent)
 	}
 
 	session->SetNetAddress(NetAddress(sockAddress));
-	session->ProcessConnect();
+	session->ProcessConnect(); // 흠...
 
 	RegisterAccept(acceptEvent);
 }

@@ -24,7 +24,7 @@ public:
 	BYTE*			Data()			{ return _buffer.data(); }
 	BYTE*			ReadPos()		{ return &_buffer[_readPos]; }
 	BYTE*			WritePos()		{ return &_buffer[_writePos]; }
-	int32			Size()			{ return _buffer.size(); }
+	int32			Size()			{ return (int32)_buffer.size(); }
 	int32			UnreadSize()	{ return _writePos - _readPos; }
 	int32			FreeSize()		{ return _bufferSize - _writePos; }
 

@@ -2,6 +2,7 @@
 #include <thread>
 #include "Service.h"
 #include "IocpCore.h"
+#include "GameSession.h"
 
 void WorkerThreadMain(ServerServiceRef service)
 {
@@ -16,6 +17,7 @@ int main(void)
 	ServerServiceRef service = make_shared<ServerService>(
 		NetAddress("127.0.0.1"s, 7777),
 		make_shared<IocpCore>(),
+		[=]() { return make_shared<GameSession>(); }, // TODO : SessionManager 등
 		30
 	);
 
