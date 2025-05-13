@@ -13,7 +13,7 @@
     <ClCompile Include="GameServer.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="ThreadManager.cpp">
+    <ClCompile Include="GameSession.cpp">
       <Filter>Main</Filter>
     </ClCompile>
   </ItemGroup>
@@ -21,8 +21,6 @@
     <ClInclude Include="pch.h">
       <Filter>Main</Filter>
     </ClInclude>
-    <ClInclude Include="ThreadManager.h">
-      <Filter>Main</Filter>
-    </ClInclude>
+    <ClInclude Include="GameSession.h" />
   </ItemGroup>
 </Project>
