@@ -24,6 +24,11 @@ using uint64 = unsigned __int64;
 
 USING_SHARED_PTR(ServerService);
 USING_SHARED_PTR(IocpCore);
+USING_SHARED_PTR(Listener);
+USING_SHARED_PTR(IocpObject);
+USING_SHARED_PTR(Session);
+USING_SHARED_PTR(SendBuffer);
+USING_SHARED_PTR(PacketSession);
 
 #define size16(val)		static_cast<int16>(sizeof(val))
 #define size32(val)		static_cast<int32>(sizeof(val))
