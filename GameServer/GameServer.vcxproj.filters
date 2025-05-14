@@ -59,16 +59,16 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Common\protoc-21.12-win64\bin\Protocol.proto">
+    <None Include="..\Common\Protobuf\bin\Enum.proto">
       <Filter>Protocol</Filter>
     </None>
-    <None Include="..\Common\protoc-21.12-win64\bin\Enum.proto">
+    <None Include="..\Common\Protobuf\bin\GenPackets.bat">
       <Filter>Protocol</Filter>
     </None>
-    <None Include="..\Common\protoc-21.12-win64\bin\Struct.proto">
+    <None Include="..\Common\Protobuf\bin\Protocol.proto">
       <Filter>Protocol</Filter>
     </None>
-    <None Include="..\Common\protoc-21.12-win64\bin\GenPackets.bat">
+    <None Include="..\Common\Protobuf\bin\Struct.proto">
       <Filter>Protocol</Filter>
     </None>
   </ItemGroup>
