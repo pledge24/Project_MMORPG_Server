@@ -1,41 +1,84 @@
 #pragma once
-#include "Listener.h"
 #include "NetAddress.h"
+#include "IocpCore.h"
+#include "Listener.h"
+#include <functional>
 
-enum class ServiceType
+enum class ServiceType : uint8
 {
-	Client,
-	Server
+	Server,
+	Client
 };
 
-//class Service
-//{
-//};
-//
-//class ClientService : public Service
-//{
-//
-//};
+using SessionFactory = function<SessionRef(void)>;
 
-/*-----------------
-	ServerService
-------------------*/
+/*-------------------
+		Service
+--------------------*/
 
-// 일단 IOCP 모델 고정으로 생각.
-class ServerService
+class Service : public enable_shared_from_this<Service>
 {
 public:
-	ServerService(NetAddress serverAddr, IocpCoreRef core, int32 maxSessionsCount = 1);
+	Service(ServiceType type, NetAddress address, IocpCoreRef core, SessionFactory factory, int32 maxSessionCount = 1);
+	virtual ~Service();
 
-	NetAddress GetServerAddr() { return _serverAddr; }
+	virtual bool		Start() abstract;
+	bool				CanStart() { return _sessionFactory != nullptr; }
 
-	bool Start();
+	virtual void		CloseService();
+	void				SetSessionFactory(SessionFactory func) { _sessionFactory = func; }
 
-	int32 GetMaxSessionCount() { return _maxSessionsCount; }
+	void				Broadcast(SendBufferRef sendBuffer);
+	SessionRef			CreateSession();
+	void				AddSession(SessionRef session);
+	void				RemoveSession(SessionRef session);
+	int32				GetCurrentSessionCount() { return _sessionCount; }
+	int32				GetMaxSessionCount() { return _maxSessionCount; }
+
+public:
+	ServiceType			GetServiceType() { return _type; }
+	NetAddress			GetNetAddress() { return _netAddress; }
+	IocpCoreRef&		GetIocpCore() { return _iocpCore; }
+
+protected:
+	USE_LOCK;
+	ServiceType			_type;
+	NetAddress			_netAddress = {};
+	IocpCoreRef			_iocpCore;
+
+	set<SessionRef>		_sessions;
+	int32				_sessionCount = 0;
+	int32				_maxSessionCount = 0;
+	SessionFactory		_sessionFactory;
+};
+
+/*-------------------
+	ClientService
+--------------------*/
+
+class ClientService : public Service
+{
+public:
+	ClientService(NetAddress targetAddress, IocpCoreRef core, SessionFactory factory, int32 maxSessionCount = 1);
+	virtual ~ClientService() {}
+
+	virtual bool	Start() override;
+};
+
+
+/*-------------------
+	ServerService
+--------------------*/
+
+class ServerService : public Service
+{
+public:
+	ServerService(NetAddress targetAddress, IocpCoreRef core, SessionFactory factory, int32 maxSessionCount = 1);
+	virtual ~ServerService() {}
+
+	virtual bool	Start() override;
+	virtual void	CloseService() override;
 
 private:
-	NetAddress _serverAddr;
-	IocpCoreRef _core;
-	int32 _maxSessionsCount;
-	Listener _listener;
+	ListenerRef		_listener = nullptr;
 };

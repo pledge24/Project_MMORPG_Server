@@ -21,7 +21,11 @@ public:
 	IocpCore();
 	~IocpCore();
 
-private:
+public:
+	bool		RegisterSocket(SOCKET socket);
+	bool		Dispatch(uint32 timeoutMs = INFINITE);
 
+private:
+	HANDLE		_iocpHandle;
 };
 

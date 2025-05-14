@@ -17,6 +17,7 @@ void ThreadManager::Launch(function<void(void)> callback)
             // Launch시 실행할 함수 추가
 			callback();
 		}));
+
 }
 
 void ThreadManager::Join()

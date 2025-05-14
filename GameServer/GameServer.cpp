@@ -3,7 +3,6 @@
 #include "Service.h"
 #include "IocpCore.h"
 #include "GameSession.h"
-#include "Protocol.pb.h"
 
 void WorkerThreadMain(ServerServiceRef service)
 {

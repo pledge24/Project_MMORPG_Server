@@ -16,7 +16,7 @@
     <ClCompile Include="GameServer.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="ThreadManager.cpp">
+    <ClCompile Include="GameSession.cpp">
       <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="GameSessionManager.cpp">
