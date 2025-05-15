@@ -1,6 +1,10 @@
 #include "pch.h"
 #include "RecvBuffer.h"
 
+/*-------------------
+	  RecvBuffer
+--------------------*/
+
 RecvBuffer::RecvBuffer(int32 chunkSize, int32 multipleN) : 
 	_chunkSize(chunkSize), _multipleN(max(multipleN, MIN_MULTIPLE_N))
 {
@@ -12,12 +16,13 @@ RecvBuffer::~RecvBuffer()
 {
 }
 
+// [--------XXXX__________] ('--': 읽은 메모리, 'XXX': 안읽은 메모리, '__': free 메모리 )
+// [XXXX__________________]
 void RecvBuffer::Clean()
 {
 	int32 dataSize = UnreadSize();
 	if (dataSize == 0)
 	{
-		// 딱 마침 읽기+쓰기 커서가 동일한 위치라면, 둘 다 리셋.
 		_readPos = _writePos = 0;
 	}
 	else
@@ -34,7 +39,7 @@ void RecvBuffer::Clean()
 
 bool RecvBuffer::OnRead(int32 readBytes)
 {
-	if (readBytes > UnreadSize())
+	if (UnreadSize() < readBytes)
 		return false;
 
 	_readPos += readBytes;
@@ -43,7 +48,7 @@ bool RecvBuffer::OnRead(int32 readBytes)
 
 bool RecvBuffer::OnWrite(int32 writeBytes)
 {
-	if (writeBytes > FreeSize())
+	if (FreeSize() < writeBytes)
 		return false;
 
 	_writePos += writeBytes;

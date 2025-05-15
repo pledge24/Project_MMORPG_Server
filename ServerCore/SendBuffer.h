@@ -4,7 +4,7 @@
 	  SendBuffer
 --------------------*/
 
-// TCP 송신 버퍼
+// TCP 송신 버퍼(고정 길이)
 class SendBuffer
 {
 public:
@@ -12,16 +12,16 @@ public:
 	~SendBuffer();
 
 public:
-	BYTE*			Data()								{ return _buffer.data(); }
-	int32			Size()								{ return _buffer.size(); }
+					/* SendBuffer 정보 관련 */
+	BYTE*			Buffer()							{ return _buffer.data(); }
+	int32			Len()								{ return _buffer.size(); }
 	int32			WriteSize()							{ return _writePos; }
 	int32			FreeSize()							{ return _buffer.size() - _writePos; }
 	BYTE*			WritePos()							{ return &_buffer[_writePos]; }
 
-	void			Resize(int32 bufferSize);
-	void			Clear();
-	void			CopyData(void* data, int32 len);
-	void			AppendData(void* data, int32 len);
+					/* RecvBuffer 데이터 조작 관련 */
+	bool			Copy(void* data, int32 len);
+	bool			Append(void* data, int32 len);
 
 private:
 	vector<BYTE>	_buffer;
