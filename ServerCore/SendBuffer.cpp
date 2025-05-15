@@ -14,6 +14,11 @@ SendBuffer::~SendBuffer()
 {
 }
 
+void SendBuffer::Close(uint32 writeSize)
+{
+	_writePos = writeSize;
+}
+
 bool SendBuffer::Copy(void* data, int32 len)
 {
 	if (Len() < len)

@@ -5,6 +5,8 @@
 --------------------*/
 
 // TCP 송신 버퍼(고정 길이)
+// [-----------___________] (O)
+// [---__---_-____________] (X)
 class SendBuffer
 {
 public:
@@ -12,6 +14,9 @@ public:
 	~SendBuffer();
 
 public:
+					/* SerializeToArray() 호출시에만 사용 */
+	void			Close(uint32 writeSize);  
+
 					/* SendBuffer 정보 관련 */
 	BYTE*			Buffer()							{ return _buffer.data(); }
 	int32			Len()								{ return _buffer.size(); }
