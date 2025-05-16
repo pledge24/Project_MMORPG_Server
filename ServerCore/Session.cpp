@@ -167,7 +167,7 @@ void Session::RegisterSend()
 	for (SendBufferRef sendBuffer : _sendEvent.sendBuffers)
 	{
 		WSABUF wsaBuf;
-		wsaBuf.buf = reinterpret_cast<char*>(sendBuffer->Data());
+		wsaBuf.buf = reinterpret_cast<char*>(sendBuffer->Buffer());
 		wsaBuf.len = static_cast<LONG>(sendBuffer->WriteSize());
 		wsaBufs.push_back(wsaBuf);
 	}

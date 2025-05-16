@@ -1,14 +1,16 @@
 #pragma once
 
+/*-----------------
+	   Common
+------------------*/
 #include "Types.h"
 #include "CoreMacro.h"
 #include "CoreGlobal.h"
-#include "SendBuffer.h"
 
 #include <iostream>
 
 /*-----------------
-	DataStructure
+	STL Container
 ------------------*/
 #include <array>
 #include <vector>
@@ -27,6 +29,12 @@
 #include <mswsock.h>
 #include <ws2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
+
+/*-----------------
+	   Network
+------------------*/
+#include "SendBuffer.h"
+#include "Session.h"
 
 using namespace std;
 

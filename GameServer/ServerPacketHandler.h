@@ -6,7 +6,7 @@
 #endif
 
 using PacketHandlerFunc = std::function<bool(PacketSessionRef&, BYTE*, int32)>;
-extern PacketHandlerFunc GPacketHandler[UINT16_MAX];
+extern PacketHandlerFunc GPacketHandler[UINT16_MAX]; // pkdId : 0~65535
 
 enum : uint16
 {
@@ -15,8 +15,7 @@ enum : uint16
 };
 
 bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len);
-
-// Auto-generated template Handle Functions
+// ===== Auto-generated template Handle Functions =====
 bool Handle_C_TEST(PacketSessionRef& session, Protocol::C_TEST& pkt);
 
 class ServerPacketHandler
@@ -44,6 +43,7 @@ private:
 	template<typename PacketType, typename ProcessFunc>
 	static bool HandlePacket(ProcessFunc func, PacketSessionRef& session, BYTE* buffer, int32 len)
 	{
+		/* deserialize packet data */
 		PacketType pkt;
 		if (pkt.ParseFromArray(buffer + sizeof(PacketHeader), len - sizeof(PacketHeader)) == false)
 			return false;
@@ -54,8 +54,8 @@ private:
 	template<typename T>
 	static SendBufferRef MakeSerializedPacket(T& pkt, uint16 pktId)
 	{
-		const uint16 dataSize = static_cast<uint16>(pkt.ByteSizeLong());
-		const uint16 packetSize = dataSize + sizeof(PacketHeader);
+		const uint16 payloadSize = static_cast<uint16>(pkt.ByteSizeLong());
+		const uint16 packetSize = sizeof(PacketHeader) + payloadSize ;
 
 #if UE_BUILD_DEBUG + UE_BUILD_DEVELOPMENT + UE_BUILD_TEST + UE_BUILD_SHIPPING >= 1
 		SendBufferRef sendBuffer = MakeShared<SendBuffer>(packetSize);
@@ -63,10 +63,12 @@ private:
 		SendBufferRef sendBuffer = make_shared<SendBuffer>(packetSize);
 #endif
 
+		/* serialize packet data */
 		PacketHeader* header = reinterpret_cast<PacketHeader*>(sendBuffer->Buffer());
 		header->size = packetSize;
 		header->id = pktId;
-		pkt.SerializeToArray(&header[1], dataSize);
+		pkt.SerializeToArray(sendBuffer->Buffer() + sizeof(PacketHeader), payloadSize);
+
 		sendBuffer->Close(packetSize);
 
 		return sendBuffer;
