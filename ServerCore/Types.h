@@ -24,6 +24,7 @@ using uint64 = unsigned __int64;
 
 
 USING_SHARED_PTR(ServerService);
+USING_SHARED_PTR(ClientService);
 USING_SHARED_PTR(IocpCore);
 USING_SHARED_PTR(Listener);
 USING_SHARED_PTR(IocpObject);

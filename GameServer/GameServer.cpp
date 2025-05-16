@@ -3,6 +3,7 @@
 #include "Service.h"
 #include "IocpCore.h"
 #include "GameSession.h"
+#include "ServerPacketHandler.h"
 
 void WorkerThreadMain(ServerServiceRef service)
 {
@@ -14,6 +15,8 @@ void WorkerThreadMain(ServerServiceRef service)
 
 int main(void)
 {
+	ServerPacketHandler::Init();
+
 	ServerServiceRef service = make_shared<ServerService>(
 		NetAddress("127.0.0.1"s, 7777),
 		make_shared<IocpCore>(),

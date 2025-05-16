@@ -8,6 +8,7 @@
 using PacketHandlerFunc = std::function<bool(PacketSessionRef&, BYTE*, int32)>;
 extern PacketHandlerFunc GPacketHandler[UINT16_MAX];
 
+// Auto-generated
 enum : uint16
 {
 {%- for pkt in parser.total_pkt %}

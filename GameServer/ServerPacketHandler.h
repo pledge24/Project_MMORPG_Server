@@ -10,13 +10,19 @@ extern PacketHandlerFunc GPacketHandler[UINT16_MAX]; // pkdId : 0~65535
 
 enum : uint16
 {
-	PKT_S_TEST = 1000,
-	PKT_C_TEST = 1001,
+	PKT_C_LOGIN = 1000,
+	PKT_S_LOGIN = 1001,
+	PKT_C_ENTER_GAME = 1002,
+	PKT_S_ENTER_GAME = 1003,
+	PKT_C_CHAT = 1004,
+	PKT_S_CHAT = 1005,
 };
 
 bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len);
 // ===== Auto-generated template Handle Functions =====
-bool Handle_C_TEST(PacketSessionRef& session, Protocol::C_TEST& pkt);
+bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt);
+bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt);
+bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt);
 
 class ServerPacketHandler
 {
@@ -27,7 +33,9 @@ public:
 			GPacketHandler[i] = Handle_INVALID;
 
 		// Auto-generated
-		GPacketHandler[PKT_C_TEST] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::C_TEST>(Handle_C_TEST, session, buffer, len); };
+		GPacketHandler[PKT_C_LOGIN] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::C_LOGIN>(Handle_C_LOGIN, session, buffer, len); };
+		GPacketHandler[PKT_C_ENTER_GAME] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::C_ENTER_GAME>(Handle_C_ENTER_GAME, session, buffer, len); };
+		GPacketHandler[PKT_C_CHAT] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::C_CHAT>(Handle_C_CHAT, session, buffer, len); };
 	}
 
 	static bool HandlePacket(PacketSessionRef& session, BYTE* buffer, int32 len)
@@ -37,7 +45,9 @@ public:
 	}
 
 	// Auto-generated
-	static SendBufferRef MakeSerializedPacket(Protocol::S_TEST& pkt) { return MakeSerializedPacket(pkt, PKT_S_TEST); }
+	static SendBufferRef MakeSerializedPacket(Protocol::S_LOGIN& pkt) { return MakeSerializedPacket(pkt, PKT_S_LOGIN); }
+	static SendBufferRef MakeSerializedPacket(Protocol::S_ENTER_GAME& pkt) { return MakeSerializedPacket(pkt, PKT_S_ENTER_GAME); }
+	static SendBufferRef MakeSerializedPacket(Protocol::S_CHAT& pkt) { return MakeSerializedPacket(pkt, PKT_S_CHAT); }
 
 private:
 	template<typename PacketType, typename ProcessFunc>

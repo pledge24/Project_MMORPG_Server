@@ -83,7 +83,7 @@ private:
 
 							/* sendEvent 관련 */
 	queue<SendBufferRef>	_sendQueue;
-	atomic<bool>			_sendRegistered = true;
+	atomic<bool>			_sendRegistered = false;
 
 private:
 							/* IocpEvent 재사용 */
