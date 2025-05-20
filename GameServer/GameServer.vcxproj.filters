@@ -5,6 +5,12 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Protocol">
+      <UniqueIdentifier>{18e8ca97-d284-45fb-951a-71dc7236cb10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{3b44e930-ad63-4510-a2be-d0ac43d54f19}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -16,11 +22,69 @@
     <ClCompile Include="GameSession.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="GameSessionManager.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerPacketHandler.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Protocol.pb.cc">
+      <Filter>Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="Struct.pb.cc">
+      <Filter>Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="Enum.pb.cc">
+      <Filter>Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Room.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
       <Filter>Main</Filter>
     </ClInclude>
-    <ClInclude Include="GameSession.h" />
+    <ClInclude Include="GameSession.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSessionManager.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerPacketHandler.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Enum.pb.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="Protocol.pb.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="Struct.pb.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Room.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Common\Protobuf\bin\Enum.proto">
+      <Filter>Protocol</Filter>
+    </None>
+    <None Include="..\Common\Protobuf\bin\GenPackets.bat">
+      <Filter>Protocol</Filter>
+    </None>
+    <None Include="..\Common\Protobuf\bin\Protocol.proto">
+      <Filter>Protocol</Filter>
+    </None>
+    <None Include="..\Common\Protobuf\bin\Struct.proto">
+      <Filter>Protocol</Filter>
+    </None>
   </ItemGroup>
 </Project>

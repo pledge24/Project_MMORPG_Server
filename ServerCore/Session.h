@@ -25,7 +25,7 @@ class Session : public IocpObject
 
 public:
 	Session();
-	~Session();
+	virtual ~Session();
 
 public:
 							/* 인터페이스 구현(외부 사용) */
@@ -83,7 +83,7 @@ private:
 
 							/* sendEvent 관련 */
 	queue<SendBufferRef>	_sendQueue;
-	atomic<bool>			_sendRegistered = true;
+	atomic<bool>			_sendRegistered = false;
 
 private:
 							/* IocpEvent 재사용 */
@@ -91,4 +91,28 @@ private:
 	DisconnectEvent			_disconnectEvent;
 	RecvEvent				_recvEvent;
 	SendEvent				_sendEvent;
+};
+
+/*---------------------
+	  PacketSession
+----------------------*/
+
+struct PacketHeader
+{
+	uint16 size; // 2 BYTE
+	uint16 id;	 // 2 BYTE
+};
+
+// 패킷 단위로 통신하는 세션
+class PacketSession : public Session
+{
+public:
+	PacketSession();
+	virtual ~PacketSession();
+
+	PacketSessionRef		GetPacketSessionRef() { return static_pointer_cast<PacketSession>(shared_from_this()); }
+
+protected:
+	virtual int32			OnRecv(BYTE* buffer, int32 len) final;
+	virtual void			OnRecvPacket(BYTE* buffer, int32 len) = 0;
 };

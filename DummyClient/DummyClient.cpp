@@ -1,129 +1,90 @@
 #include "pch.h"
-#include <thread>
-#include <string>
+#include <iostream>
+#include "ThreadManager.h"
+#include "Service.h"
+#include "Session.h"
+#include "ClientPacketHandler.h"
+#include "SocketUtil.h"
 
-#define OUT
+char sendData[] = "Hello World";
 
-void SendHelloWorld(SOCKET& clientSocket)
+class ServerSession : public PacketSession
 {
-	// Send Hello World for 1s.
-	while (true)
+public:
+	~ServerSession()
 	{
-		string sendBuffer = "Hello World";
-		WSAEVENT wsaEvent = ::WSACreateEvent();
-		WSAOVERLAPPED overlapped = {};
-		overlapped.hEvent = wsaEvent;
-
-		WSABUF wsaBuf;
-		wsaBuf.buf = const_cast<char*>(sendBuffer.data());
-		wsaBuf.len = sendBuffer.size();
-
-		DWORD numOfBytes = 0;
-		DWORD flags = 0;
-
-		// Register Send
-		if (::WSASend(clientSocket, &wsaBuf, 1, &numOfBytes, flags, &overlapped, nullptr) == SOCKET_ERROR)
-		{
-			// Pending
-			//if (::WSAGetLastError() == WSA_IO_PENDING)
-			//{
-			//	::WSAWaitForMultipleEvents(1, &wsaEvent, TRUE, WSA_INFINITE, FALSE);
-			//	::WSAGetOverlappedResult(clientSocket, &overlapped, &numberOfBytesSent, FALSE, &flags);
-			//}
-			//else
-			//{
-			//	// TODO: 오류 처리
-			//	// ...
-			//	break;
-			//}
-		}
-
-		cout << "Send Data ! Len = " << numOfBytes << endl;
-
-		this_thread::sleep_for(1s);
-
+		cout << "~ServerSession" << endl;
 	}
-}
 
-int main(void)
+	virtual void OnConnected() override
+	{
+		cout << "OnConnected" << endl;
+
+		//Protocol::C_LOGIN pkt;
+		//auto sendBuffer = ClientPacketHandler::MakeSerializedPacket(pkt);
+		//Send(sendBuffer);
+
+		//this_thread::sleep_for(3s);
+
+		//SOCKET socket = GetSocket();
+		//SocketUtil::Close(socket);
+	}
+
+	virtual void OnRecvPacket(BYTE* buffer, int32 len) override
+	{
+		PacketSessionRef session = GetPacketSessionRef();
+		PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
+
+		// TODO : packetId 대역 체크
+		ClientPacketHandler::HandlePacket(session, buffer, len);
+	}
+
+	virtual void OnSend(int32 len) override
+	{
+		//cout << "OnSend Len = " << len << endl;
+	}
+
+	virtual void OnDisconnected() override
+	{
+		cout << "Disconnected" << endl;
+	}
+};
+
+int main()
 {
-	// Winsock Init
-	WSAData wsaData;
-	if (::WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
-		return 0;
+	ClientPacketHandler::Init();
 
-	// 소켓 생성
-	SOCKET clientSocket = ::socket(AF_INET, SOCK_STREAM, 0);
-	if (clientSocket == INVALID_SOCKET)
-		return 0;
+	this_thread::sleep_for(1s);
 
-	// 논블로킹 설정
-	u_long on = 1;
-	if(::ioctlsocket(clientSocket, FIONBIO, &on) == INVALID_SOCKET)
-		return 0;
+	ClientServiceRef service = make_shared<ClientService>(
+		NetAddress("127.0.0.1"s, 7777),
+		make_shared<IocpCore>(),
+		[=]() { return make_shared<ServerSession>(); }, // TODO : SessionManager 등
+		1);
 
-	// 서버 주소 설정
-	SOCKADDR_IN serverAddr;
-	::memset(&serverAddr, 0, sizeof(serverAddr));
-	serverAddr.sin_family = AF_INET;
-	::inet_pton(AF_INET, "127.0.0.1", OUT &serverAddr.sin_addr);
-	serverAddr.sin_port = ::htons(7777);
+	ASSERT_CRASH(service->Start());
 
-	// Connect
-	while (::connect(clientSocket, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
+	for (int32 i = 0; i < 2; i++)
 	{
-		// 논블로킹 처리
-		if (::WSAGetLastError() == WSAEWOULDBLOCK)
-			continue;
-
-		// 이미 연결됨
-		if (::WSAGetLastError() == WSAEISCONN)
-			break;
+		GThreadManager->Launch([=]()
+			{
+				while (true)
+				{
+					service->GetIocpCore()->Dispatch();
+				}
+			});
 	}
 
-	cout << "Connected to Server" << endl;
+	//Protocol::C_CHAT chatPkt;
+	//chatPkt.set_msg(u8"Hello World !");
+	//auto sendBuffer = ClientPacketHandler::MakeSerializedPacket(chatPkt);
 
-	// send Thread;
-	thread t1(SendHelloWorld, ref(clientSocket));
+	//while (true)
+	//{
+	//	service->Broadcast(sendBuffer);
+	//	this_thread::sleep_for(1s);
+	//}
 
+	GThreadManager->Join();
 
-	// Recv(Main Thread)
-	while (true)
-	{	
-		char recvBuffer[1000];
-
-		WSABUF wsaBuf;
-		wsaBuf.buf = recvBuffer;
-		wsaBuf.len = 1000;
-
-		DWORD numberOfBytesRecv = 0;
-		DWORD flags = 0;
-
-		WSAEVENT wsaEvent = ::WSACreateEvent();
-		WSAOVERLAPPED overlapped = {};
-		overlapped.hEvent = wsaEvent;
-
-		// Register recv
-		if (::WSARecv(clientSocket, &wsaBuf, 1, &numberOfBytesRecv, &flags, &overlapped, NULL) == SOCKET_ERROR)
-		{
-			// Pending
-			int errCode = WSAGetLastError();
-			if (errCode == WSA_IO_PENDING)
-			{
-				::WSAWaitForMultipleEvents(1, &wsaEvent, TRUE, WSA_INFINITE, FALSE);
-				::WSAGetOverlappedResult(clientSocket, &overlapped, &numberOfBytesRecv, FALSE, &flags);
-			}
-			else
-			{
-				// TODO: 오류 처리
-				// ...
-				break;
-			}
-		}
-
-		string recvStr(recvBuffer, numberOfBytesRecv);
-		cout << "complete to recv data = " << recvStr << " " << numberOfBytesRecv << endl;
-	}
-
-	return 0;
 }

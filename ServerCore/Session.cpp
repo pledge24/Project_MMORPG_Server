@@ -11,6 +11,7 @@ Session::Session() : _recvBuffer(BUFFER_SIZE)
 
 Session::~Session()
 {
+	SocketUtil::Close(_socket);
 }
 
 HANDLE Session::GetHandle()
@@ -122,6 +123,9 @@ bool Session::RegisterDisconnect()
 
 void Session::RegisterRecv()
 {
+	_recvEvent.Init();
+	_recvEvent.owner = shared_from_this(); // ADD_REF
+
 	WSABUF wsaBuf;
 	wsaBuf.buf = reinterpret_cast<char*>(_recvBuffer.WritePos());
 	wsaBuf.len = _recvBuffer.FreeSize();
@@ -129,10 +133,15 @@ void Session::RegisterRecv()
 	DWORD numOfBytes = 0;
 	DWORD flags = 0;
 
-	RecvEvent* recvEvent = new RecvEvent();
-	recvEvent->owner = static_pointer_cast<Session>(shared_from_this());
-
-	::WSARecv(_socket, &wsaBuf, 1, &numOfBytes, &flags, static_cast<LPWSAOVERLAPPED>(recvEvent), NULL);
+	if (SOCKET_ERROR == ::WSARecv(_socket, &wsaBuf, 1, OUT & numOfBytes, OUT & flags, &_recvEvent, nullptr))
+	{
+		int32 errorCode = ::WSAGetLastError();
+		if (errorCode != WSA_IO_PENDING)
+		{
+			HandleError(errorCode);
+			_recvEvent.owner = nullptr; // RELEASE_REF
+		}
+	}
 }
 
 // 직렬화(serialized)된 패킷을 받아서 비동기 송신.
@@ -167,7 +176,7 @@ void Session::RegisterSend()
 	for (SendBufferRef sendBuffer : _sendEvent.sendBuffers)
 	{
 		WSABUF wsaBuf;
-		wsaBuf.buf = reinterpret_cast<char*>(sendBuffer->Data());
+		wsaBuf.buf = reinterpret_cast<char*>(sendBuffer->Buffer());
 		wsaBuf.len = static_cast<LONG>(sendBuffer->WriteSize());
 		wsaBufs.push_back(wsaBuf);
 	}
@@ -204,6 +213,10 @@ void Session::ProcessConnect()
 
 void Session::ProcessDisconnect()
 {
+	_disconnectEvent.owner = nullptr; // RELEASE_REF
+
+	OnDisconnected(); // 컨텐츠 코드에서 재정의
+	GetService()->RemoveSession(GetSessionRef());
 }
 
 void Session::ProcessRecv(int32 numOfBytes)
@@ -225,7 +238,7 @@ void Session::ProcessRecv(int32 numOfBytes)
 	int32 unreadSize = _recvBuffer.UnreadSize();
 
 	// processLen: 잘라가서 처리한 패킷 크기.
-	int32 processLen = OnRecv(_recvBuffer.ReadPos(), unreadSize); // 컨텐츠 코드에서 재정의
+	int32 processLen = OnRecv(_recvBuffer.ReadPos(), unreadSize);
 	if (processLen < 0 || unreadSize < processLen || _recvBuffer.OnRead(processLen) == false)
 	{
 		Disconnect("OnRead Overflow");
@@ -275,4 +288,43 @@ void Session::HandleError(int32 errorCode)
 		cout << "Handle Error : " << errorCode << endl;
 		break;
 	}
+}
+
+/*---------------------
+	  PacketSession
+----------------------*/
+
+PacketSession::PacketSession()
+{
+}
+
+PacketSession::~PacketSession()
+{
+}
+
+// [size(2)][id(2)][data....][size(2)][id(2)][data....]
+int32 PacketSession::OnRecv(BYTE* buffer, int32 len)
+{
+	int32 processLen = 0;
+
+	while (true)
+	{
+		int32 dataSize = len - processLen;
+
+		if (dataSize < sizeof(PacketHeader))
+			break;
+
+		PacketHeader header = *(reinterpret_cast<PacketHeader*>(&buffer[processLen]));
+
+		if (dataSize < header.size)
+			break;
+
+		// ---온전한 패킷 하나 조립 성공 시 진입---
+
+		OnRecvPacket(&buffer[processLen], header.size); /* 컨텐츠 코드에서 재정의 */
+
+		processLen += header.size;
+	}
+
+	return processLen;
 }

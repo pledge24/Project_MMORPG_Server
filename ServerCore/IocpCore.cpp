@@ -38,6 +38,7 @@ bool IocpCore::Dispatch(uint32 timeoutMs)
 			return false;
 		default:
 			// TODO : 로그 찍기
+			cout << "errcode: " << errCode << endl; // 64
 			IocpObjectRef iocpObject = networkEvent->owner;
 			iocpObject->Dispatch(networkEvent, numOfBytes);
 			break;
