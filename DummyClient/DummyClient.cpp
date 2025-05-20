@@ -4,6 +4,7 @@
 #include "Service.h"
 #include "Session.h"
 #include "ClientPacketHandler.h"
+#include "SocketUtil.h"
 
 char sendData[] = "Hello World";
 
@@ -17,11 +18,16 @@ public:
 
 	virtual void OnConnected() override
 	{
-		/*cout << "OnConnected" << endl;*/
+		cout << "OnConnected" << endl;
 
-		Protocol::C_LOGIN pkt;
-		auto sendBuffer = ClientPacketHandler::MakeSerializedPacket(pkt);
-		Send(sendBuffer);
+		//Protocol::C_LOGIN pkt;
+		//auto sendBuffer = ClientPacketHandler::MakeSerializedPacket(pkt);
+		//Send(sendBuffer);
+
+		//this_thread::sleep_for(3s);
+
+		//SOCKET socket = GetSocket();
+		//SocketUtil::Close(socket);
 	}
 
 	virtual void OnRecvPacket(BYTE* buffer, int32 len) override
@@ -54,7 +60,7 @@ int main()
 		NetAddress("127.0.0.1"s, 7777),
 		make_shared<IocpCore>(),
 		[=]() { return make_shared<ServerSession>(); }, // TODO : SessionManager 등
-		100);
+		1);
 
 	ASSERT_CRASH(service->Start());
 
@@ -69,15 +75,15 @@ int main()
 			});
 	}
 
-	Protocol::C_CHAT chatPkt;
-	chatPkt.set_msg(u8"Hello World !");
-	auto sendBuffer = ClientPacketHandler::MakeSerializedPacket(chatPkt);
+	//Protocol::C_CHAT chatPkt;
+	//chatPkt.set_msg(u8"Hello World !");
+	//auto sendBuffer = ClientPacketHandler::MakeSerializedPacket(chatPkt);
 
-	while (true)
-	{
-		service->Broadcast(sendBuffer);
-		this_thread::sleep_for(1s);
-	}
+	//while (true)
+	//{
+	//	service->Broadcast(sendBuffer);
+	//	this_thread::sleep_for(1s);
+	//}
 
 	GThreadManager->Join();
 

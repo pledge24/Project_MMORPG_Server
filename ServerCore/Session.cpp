@@ -11,6 +11,7 @@ Session::Session() : _recvBuffer(BUFFER_SIZE)
 
 Session::~Session()
 {
+	SocketUtil::Close(_socket);
 }
 
 HANDLE Session::GetHandle()
@@ -122,6 +123,9 @@ bool Session::RegisterDisconnect()
 
 void Session::RegisterRecv()
 {
+	_recvEvent.Init();
+	_recvEvent.owner = shared_from_this(); // ADD_REF
+
 	WSABUF wsaBuf;
 	wsaBuf.buf = reinterpret_cast<char*>(_recvBuffer.WritePos());
 	wsaBuf.len = _recvBuffer.FreeSize();
@@ -129,10 +133,15 @@ void Session::RegisterRecv()
 	DWORD numOfBytes = 0;
 	DWORD flags = 0;
 
-	RecvEvent* recvEvent = new RecvEvent();
-	recvEvent->owner = static_pointer_cast<Session>(shared_from_this());
-
-	::WSARecv(_socket, &wsaBuf, 1, &numOfBytes, &flags, static_cast<LPWSAOVERLAPPED>(recvEvent), NULL);
+	if (SOCKET_ERROR == ::WSARecv(_socket, &wsaBuf, 1, OUT & numOfBytes, OUT & flags, &_recvEvent, nullptr))
+	{
+		int32 errorCode = ::WSAGetLastError();
+		if (errorCode != WSA_IO_PENDING)
+		{
+			HandleError(errorCode);
+			_recvEvent.owner = nullptr; // RELEASE_REF
+		}
+	}
 }
 
 // 직렬화(serialized)된 패킷을 받아서 비동기 송신.
@@ -204,6 +213,10 @@ void Session::ProcessConnect()
 
 void Session::ProcessDisconnect()
 {
+	_disconnectEvent.owner = nullptr; // RELEASE_REF
+
+	OnDisconnected(); // 컨텐츠 코드에서 재정의
+	GetService()->RemoveSession(GetSessionRef());
 }
 
 void Session::ProcessRecv(int32 numOfBytes)
