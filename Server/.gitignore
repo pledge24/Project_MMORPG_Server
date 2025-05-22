@@ -403,3 +403,11 @@ FodyWeavers.xsd
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio
+
+# 무시 해제 (예외 처리)
+!Libraries/
+!Common/
+
+# 하위 디렉토리와 파일들도 무시 해제
+!Libraries/**
+!Common/**
