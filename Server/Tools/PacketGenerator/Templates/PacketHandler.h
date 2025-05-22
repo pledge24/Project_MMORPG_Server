@@ -2,7 +2,7 @@
 #include "Protocol.pb.h"
 
 #if UE_BUILD_DEBUG + UE_BUILD_DEVELOPMENT + UE_BUILD_TEST + UE_BUILD_SHIPPING >= 1
-#include "S1.h"
+#include "P1.h"
 #endif
 
 using PacketHandlerFunc = std::function<bool(PacketSessionRef&, BYTE*, int32)>;

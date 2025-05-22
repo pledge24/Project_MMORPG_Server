@@ -5,8 +5,7 @@
 #include "Common/TcpSocketBuilder.h"
 #include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
-#include "Protocol.pb.h"
-#include "ClientPacketHandler.h"
+#include "PacketSession.h"
 
 void UP1GameInstance::ConnectToGameServer()
 {
@@ -27,11 +26,11 @@ void UP1GameInstance::ConnectToGameServer()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Connection Success")));
 
-		//// Session
-		//GameServerSession = MakeShared<PacketSession>(Socket);
-		//GameServerSession->Run();
+		// Session
+		GameServerSession = MakeShared<PacketSession>(Socket);
+		GameServerSession->Run();
 
-		//// TEMP : Lobby���� ĳ���� ����â ��
+		//// TEMP : Lobby
 		//{
 		//	Protocol::C_LOGIN Pkt;
 		//	SendBufferRef SendBuffer = ClientPacketHandler::MakeSendBuffer(Pkt);
@@ -52,11 +51,26 @@ void UP1GameInstance::DisconnectFromGameServer()
 	//Protocol::C_LEAVE_GAME LeavePkt;
 	//SEND_PACKET(LeavePkt);
 
-	/*if (Socket)
+	if (Socket)
 	{
 		ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get();
 		SocketSubsystem->DestroySocket(Socket);
 		Socket = nullptr;
-	}*/
+	}
 }
 
+void UP1GameInstance::HandleRecvPackets()
+{
+	if (Socket == nullptr || GameServerSession == nullptr)
+		return;
+
+	GameServerSession->HandleRecvPackets();
+}
+
+void UP1GameInstance::SendPacket(SendBufferRef SendBuffer)
+{
+	if (Socket == nullptr || GameServerSession == nullptr)
+		return;
+
+	GameServerSession->SendPacket(SendBuffer);
+}
